@@ -10,8 +10,8 @@ const quoteDisplay = document.getElementById('quoteDisplay');
 const newQuoteBtn = document.getElementById('newQuote');
 const formContainer = document.getElementById('formContainer');
 
-// Show a random quote based on selected category (if any)
-function showRandomQuote() {
+// Corrected function name: displayRandomQuote (was showRandomQuote)
+function displayRandomQuote() {
   if (quotes.length === 0) {
     quoteDisplay.textContent = "No quotes available.";
     return;
@@ -19,6 +19,8 @@ function showRandomQuote() {
 
   const randomIndex = Math.floor(Math.random() * quotes.length);
   const quote = quotes[randomIndex];
+
+  // Correct usage: set text using textContent instead of innerHTML
   quoteDisplay.textContent = `"${quote.text}" — ${quote.category}`;
 }
 
@@ -59,5 +61,5 @@ function addQuote() {
 }
 
 // Initialize app
-newQuoteBtn.addEventListener('click', showRandomQuote);
+newQuoteBtn.addEventListener('click', displayRandomQuote);
 createAddQuoteForm();
