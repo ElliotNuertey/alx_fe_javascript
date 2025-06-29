@@ -3,10 +3,10 @@ const SERVER_URL = 'https://jsonplaceholder.typicode.com/posts';
 const SYNC_INTERVAL = 60000; // 60 seconds
 
 // DOM references
-const quoteDisplay       = document.getElementById('quoteDisplay');
-const newQuoteBtn        = document.getElementById('newQuote');
-const formContainer      = document.getElementById('formContainer');
-const categoryFilter     = document.getElementById('categoryFilter');
+const quoteDisplay = document.getElementById('quoteDisplay');
+const newQuoteBtn = document.getElementById('newQuote');
+const formContainer = document.getElementById('formContainer');
+const categoryFilter = document.getElementById('categoryFilter');
 const notificationBanner = document.createElement('div');
 
 // Add notification banner to DOM
@@ -107,7 +107,7 @@ function createAddQuoteForm() {
   formContainer.appendChild(addBtn);
 }
 
-function addQuote() {
+async function addQuote() {
   const text = document.getElementById('newQuoteText').value.trim();
   const category = document.getElementById('newQuoteCategory').value.trim();
 
@@ -127,6 +127,21 @@ function addQuote() {
   saveQuotes();
   populateCategories();
   filterQuotes();
+
+  // Send to mock API (POST)
+  try {
+    const res = await fetch(SERVER_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(newQuote)
+    });
+    const responseJson = await res.json();
+    console.log('Posted to server:', responseJson);
+  } catch (error) {
+    console.error("Error posting to server:", error);
+  }
 
   document.getElementById('newQuoteText').value = '';
   document.getElementById('newQuoteCategory').value = '';
