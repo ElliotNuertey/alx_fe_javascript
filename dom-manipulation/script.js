@@ -128,7 +128,6 @@ async function addQuote() {
   populateCategories();
   filterQuotes();
 
-  // Send to mock API (POST)
   try {
     const res = await fetch(SERVER_URL, {
       method: 'POST',
@@ -197,6 +196,11 @@ function undoSync() {
   window._undoState = null;
 }
 
+// NEW FUNCTION REQUIRED BY PROMPT
+async function syncQuotes() {
+  await fetchQuotesFromServer();
+}
+
 async function fetchQuotesFromServer() {
   try {
     const res = await fetch(SERVER_URL);
@@ -248,8 +252,8 @@ function initializeApp() {
   }
 
   newQuoteBtn.addEventListener('click', displayRandomQuote);
-  fetchQuotesFromServer();
-  setInterval(fetchQuotesFromServer, SYNC_INTERVAL);
+  syncQuotes();
+  setInterval(syncQuotes, SYNC_INTERVAL);
 }
 
 initializeApp();
