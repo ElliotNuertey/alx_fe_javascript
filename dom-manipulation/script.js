@@ -1,15 +1,13 @@
 let quotes = [];
 const SERVER_URL = 'https://jsonplaceholder.typicode.com/posts';
-const SYNC_INTERVAL = 60000; // 60 seconds
+const SYNC_INTERVAL = 60000;
 
-// DOM references
 const quoteDisplay = document.getElementById('quoteDisplay');
 const newQuoteBtn = document.getElementById('newQuote');
 const formContainer = document.getElementById('formContainer');
 const categoryFilter = document.getElementById('categoryFilter');
 const notificationBanner = document.createElement('div');
 
-// Add notification banner to DOM
 notificationBanner.id = 'notificationBanner';
 notificationBanner.style = 'position: fixed; top: 0; width: 100%; background: yellow; padding: 10px; display: none; z-index: 1000;';
 document.body.prepend(notificationBanner);
@@ -196,7 +194,6 @@ function undoSync() {
   window._undoState = null;
 }
 
-// NEW FUNCTION REQUIRED BY PROMPT
 async function syncQuotes() {
   await fetchQuotesFromServer();
 }
@@ -230,8 +227,10 @@ async function fetchQuotesFromServer() {
       saveQuotes();
       populateCategories();
       filterQuotes();
-      showNotification("Server data synchronized. <button onclick='undoSync()'>Undo</button>");
+      showNotification("Quotes synced with server! <button onclick='undoSync()'>Undo</button>");
       window._undoState = previous;
+    } else {
+      showNotification("Quotes synced with server!");
     }
   } catch (error) {
     console.error("Error syncing with server:", error);
