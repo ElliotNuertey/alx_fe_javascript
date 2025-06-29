@@ -182,39 +182,41 @@ function undoSync() {
   window._undoState = null;
 }
 
-function fetchQuotesFromServer() {
-  fetch(SERVER_URL)
-    .then(res => res.json())
-    .then(serverData => {
-      let updated = false;
-      const serverQuotes = serverData.slice(0, 10).map(item => ({
-        id: item.id,
-        text: item.title,
-        category: "Server",
-        lastUpdated: Date.now()
-      }));
+async function fetchQuotesFromServer() {
+  try {
+    const res = await fetch(SERVER_URL);
+    const serverData = await res.json();
+    let updated = false;
 
-      serverQuotes.forEach(serverQuote => {
-        const local = quotes.find(q => q.id === serverQuote.id);
-        if (!local) {
-          quotes.push(serverQuote);
-          updated = true;
-        } else if (serverQuote.lastUpdated > local.lastUpdated) {
-          Object.assign(local, serverQuote);
-          updated = true;
-        }
-      });
+    const serverQuotes = serverData.slice(0, 10).map(item => ({
+      id: item.id,
+      text: item.title,
+      category: "Server",
+      lastUpdated: Date.now()
+    }));
 
-      if (updated) {
-        const previous = JSON.parse(JSON.stringify(quotes));
-        saveQuotes();
-        populateCategories();
-        filterQuotes();
-        showNotification("Server data synchronized. <button onclick='undoSync()'>Undo</button>");
-        window._undoState = previous;
+    serverQuotes.forEach(serverQuote => {
+      const local = quotes.find(q => q.id === serverQuote.id);
+      if (!local) {
+        quotes.push(serverQuote);
+        updated = true;
+      } else if (serverQuote.lastUpdated > local.lastUpdated) {
+        Object.assign(local, serverQuote);
+        updated = true;
       }
-    })
-    .catch(console.error);
+    });
+
+    if (updated) {
+      const previous = JSON.parse(JSON.stringify(quotes));
+      saveQuotes();
+      populateCategories();
+      filterQuotes();
+      showNotification("Server data synchronized. <button onclick='undoSync()'>Undo</button>");
+      window._undoState = previous;
+    }
+  } catch (error) {
+    console.error("Error syncing with server:", error);
+  }
 }
 
 function initializeApp() {
