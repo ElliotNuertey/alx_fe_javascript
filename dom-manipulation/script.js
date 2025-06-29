@@ -6,7 +6,7 @@ const newQuoteBtn = document.getElementById('newQuote');
 const formContainer = document.getElementById('formContainer');
 const categoryFilter = document.getElementById('categoryFilter');
 
-// Load quotes from localStorage or use default
+// Load quotes from localStorage or initialize default
 function loadQuotes() {
   const stored = localStorage.getItem('quotes');
   if (stored) {
@@ -26,7 +26,7 @@ function saveQuotes() {
   localStorage.setItem('quotes', JSON.stringify(quotes));
 }
 
-// Populate dropdown with unique categories
+// Populate category dropdown from unique categories
 function populateCategories() {
   const current = categoryFilter.value;
   const categories = Array.from(new Set(quotes.map(q => q.category)));
@@ -49,26 +49,30 @@ function populateCategories() {
   }
 }
 
-// Filter quotes by selected category
+// Filter quotes based on selected category
 function filterQuotes() {
-  const selected = categoryFilter.value;
-  localStorage.setItem('lastSelectedCategory', selected);
+  const selectedCategory = categoryFilter.value;
+  localStorage.setItem('lastSelectedCategory', selectedCategory);
 
-  const filtered = selected === 'all' ? quotes : quotes.filter(q => q.category === selected);
+  const filtered = selectedCategory === 'all'
+    ? quotes
+    : quotes.filter(q => q.category === selectedCategory);
 
   if (filtered.length === 0) {
     quoteDisplay.textContent = "No quotes available for this category.";
   } else {
     quoteDisplay.textContent = `"${filtered[0].text}" — ${filtered[0].category}`;
-    // Store last viewed in sessionStorage
     sessionStorage.setItem("lastQuote", JSON.stringify(filtered[0]));
   }
 }
 
-// Display a random quote from filtered results
+// Display random quote based on selected category
 function displayRandomQuote() {
-  const selected = categoryFilter.value;
-  const filtered = selected === 'all' ? quotes : quotes.filter(q => q.category === selected);
+  const selectedCategory = categoryFilter.value;
+
+  const filtered = selectedCategory === 'all'
+    ? quotes
+    : quotes.filter(q => q.category === selectedCategory);
 
   if (filtered.length === 0) {
     quoteDisplay.textContent = "No quotes available.";
@@ -81,7 +85,7 @@ function displayRandomQuote() {
   sessionStorage.setItem("lastQuote", JSON.stringify(quote));
 }
 
-// Create form to add quotes
+// Create form elements for adding quotes
 function createAddQuoteForm() {
   const inputText = document.createElement('input');
   inputText.id = 'newQuoteText';
@@ -102,7 +106,7 @@ function createAddQuoteForm() {
   formContainer.appendChild(addBtn);
 }
 
-// Add a new quote and update all storage and filters
+// Add quote to array and update UI
 function addQuote() {
   const text = document.getElementById('newQuoteText').value.trim();
   const category = document.getElementById('newQuoteCategory').value.trim();
@@ -136,7 +140,7 @@ function exportToJsonFile() {
   URL.revokeObjectURL(url);
 }
 
-// Import quotes from JSON file
+// Import quotes from uploaded JSON file
 function importFromJsonFile(event) {
   const fileReader = new FileReader();
   fileReader.onload = function(e) {
@@ -149,27 +153,29 @@ function importFromJsonFile(event) {
         filterQuotes();
         alert("Quotes imported successfully!");
       } else {
-        alert("Invalid format: expected an array.");
+        alert("Invalid JSON format. Expected an array.");
       }
     } catch (err) {
-      alert("Invalid JSON file.");
+      alert("Failed to parse JSON file.");
     }
   };
   fileReader.readAsText(event.target.files[0]);
 }
 
-// On load: initialize app
+// Initialize app
 function initializeApp() {
   loadQuotes();
   createAddQuoteForm();
   populateCategories();
-  const lastQuote = sessionStorage.getItem("lastQuote");
-  if (lastQuote) {
-    const quote = JSON.parse(lastQuote);
+
+  const last = sessionStorage.getItem("lastQuote");
+  if (last) {
+    const quote = JSON.parse(last);
     quoteDisplay.textContent = `"${quote.text}" — ${quote.category}`;
   } else {
     filterQuotes();
   }
+
   newQuoteBtn.addEventListener('click', displayRandomQuote);
 }
 
